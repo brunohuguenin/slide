@@ -6,6 +6,8 @@ export default class Slide {
     this.wrapper = document.querySelector(wrapper);
     this.dist = { fianlPosition: 0, startX: 0, movement: 0 }
     this.activeClass = 'active';
+
+    this.changeEvent = new Event('changeEvent');
   }
 
   transition(active) {
@@ -97,6 +99,7 @@ export default class Slide {
     this.slidesIndexNav(index);
     this.dist.fianlPosition = activeSlide.position;
     this.changeActiveClass();
+    this.wrapper.dispatchEvent(this.changeEvent);
   }
 
   changeActiveClass() {
@@ -147,10 +150,14 @@ export default class Slide {
 }
 
 export class SlideNav extends Slide {
+  constructor(slide, wrapper) {
+    super(slide, wrapper);
+    this.bindCrontolEvents()
+  }
   addArrow(prev, next) {
     this.prevElement = document.querySelector(prev);
     this.nextElement = document.querySelector(next);
-    this.addArrowEvent();
+    this.bindCrontolEvents();
   }
 
   addArrowEvent() {
@@ -158,4 +165,38 @@ export class SlideNav extends Slide {
     this.nextElement.addEventListener('click', this.activeNextSlide);
   }
 
+  createControl() {
+    const control = document.createElement('ul');
+    control.dataset.control = 'slide'
+    this.slideArray.forEach((item, index) => {
+      control.innerHTML += `<li><a href="slide${index}">${index + 1}</a></li>`
+    });
+    this.wrapper.appendChild(control);
+    return control;
+  }
+
+  eventCrontol(item, index) {
+    item.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.changeSlide(index);
+    });
+    this.wrapper.addEventListener('changeEvent', this.activeControlItem)
+  }
+
+  activeControlItem() {
+    this.crontolArray.forEach((item) => item.classList.remove(this.activeClass))
+    this.crontolArray[this.index.active].classList.add(this.activeClass);
+  }
+
+  addCrontol(customControl) {
+    this.control = document.querySelector(customControl) || this.createControl();
+    this.crontolArray = [...this.control.children];
+    this.activeControlItem();
+    this.crontolArray.forEach(this.eventCrontol);
+  }
+
+  bindCrontolEvents() {
+    this.eventCrontol = this.eventCrontol.bind(this);
+    this.activeControlItem = this.activeControlItem.bind(this);
+  }
 }
