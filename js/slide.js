@@ -1,12 +1,11 @@
 import debounce from '../debounce.js'
 
-export default class Slide {
+export class Slide {
   constructor(slide, wrapper) {
     this.slide = document.querySelector(slide);
     this.wrapper = document.querySelector(wrapper);
     this.dist = { fianlPosition: 0, startX: 0, movement: 0 }
     this.activeClass = 'active';
-
     this.changeEvent = new Event('changeEvent');
   }
 
@@ -149,7 +148,7 @@ export default class Slide {
   } 
 }
 
-export class SlideNav extends Slide {
+export default class SlideNav extends Slide {
   constructor(slide, wrapper) {
     super(slide, wrapper);
     this.bindCrontolEvents()
@@ -157,19 +156,20 @@ export class SlideNav extends Slide {
   addArrow(prev, next) {
     this.prevElement = document.querySelector(prev);
     this.nextElement = document.querySelector(next);
-    this.bindCrontolEvents();
+    this.addArrowEvent();
   }
 
   addArrowEvent() {
     this.prevElement.addEventListener('click', this.activePrevSlide);
     this.nextElement.addEventListener('click', this.activeNextSlide);
+    
   }
 
   createControl() {
     const control = document.createElement('ul');
     control.dataset.control = 'slide'
     this.slideArray.forEach((item, index) => {
-      control.innerHTML += `<li><a href="slide${index}">${index + 1}</a></li>`
+      control.innerHTML += `<li><a href="slide${index + 1}">${index + 1}</a></li>`
     });
     this.wrapper.appendChild(control);
     return control;
@@ -180,11 +180,11 @@ export class SlideNav extends Slide {
       event.preventDefault();
       this.changeSlide(index);
     });
-    this.wrapper.addEventListener('changeEvent', this.activeControlItem)
+    this.wrapper.addEventListener('changeEvent', this.activeControlItem);
   }
 
   activeControlItem() {
-    this.crontolArray.forEach((item) => item.classList.remove(this.activeClass))
+    this.crontolArray.forEach((item) => item.classList.remove(this.activeClass));
     this.crontolArray[this.index.active].classList.add(this.activeClass);
   }
 
